@@ -34,5 +34,7 @@ def find_solutions(tubes: list[Tube], moves: int = 0) -> list[list[str]]:
                 new_state[j] = new_target_tube
                 new_state_solutions = find_solutions(new_state, moves + 1)
                 solutions += [[move] + s for s in new_state_solutions]
+                if new_state_solutions == [[]]:
+                    return solutions
 
     return solutions
