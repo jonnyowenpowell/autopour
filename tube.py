@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from typing import cast
+
 from colours import Colour
 
 TubeContents = list[Colour | None]
 Pour = tuple[Colour, int]
+
 
 class Tube:
     __contents__: TubeContents
@@ -13,14 +16,25 @@ class Tube:
         if initial_contents == None:
             self.__contents__ = [None] * self.__max_level__
             return
-        
+
         if len(initial_contents) != self.__max_level__:
             raise ValueError(f"Initial contents must have length {self.__max_level__}")
-        
+
         self.__contents__ = initial_contents
 
     def __repr__(self) -> str:
         return self.__contents__.__repr__()
+
+    def __lt__(self, other: Tube) -> bool:
+        self_contents_without_empty = [c for c in self.__contents__ if c is not None]
+        other_contents_without_empty = [c for c in other.__contents__ if c is not None]
+        return self_contents_without_empty < other_contents_without_empty
+
+    def __eq__(self, other: object) -> bool:
+        if type(other) == Tube:
+            return self.__contents__ == cast(Tube, other).__contents__
+
+        return False
 
     def empty_spaces(self) -> int:
         empty = 0
@@ -35,10 +49,10 @@ class Tube:
 
     def top_colour(self) -> Colour | None:
         empty = self.empty_spaces()
-        
+
         if self.is_empty():
             return None
-        
+
         return self.__contents__[empty]
 
     def is_empty(self) -> bool:
@@ -87,7 +101,7 @@ class Tube:
 
         while amount > 0:
             new_contents[slot_to_fill] = colour
-            slot_to_fill -=1
+            slot_to_fill -= 1
             amount -= 1
 
         return Tube(new_contents)
@@ -96,10 +110,10 @@ class Tube:
         pour = self.will_pour()
 
         if pour == None:
-            raise ValueError('Cannot pour because tube is empty')
+            raise ValueError("Cannot pour because tube is empty")
 
         new_source_contents = self.__contents__.copy()
-        
+
         (_, amount) = pour
         pour_from = self.empty_spaces()
         while amount > 0:
@@ -108,8 +122,7 @@ class Tube:
             amount -= 1
 
         target_tube = tube.receive(pour)
-        source_tube = Tube(new_source_contents) 
+        source_tube = Tube(new_source_contents)
 
         return (source_tube, target_tube)
-        
 

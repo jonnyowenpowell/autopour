@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum, auto
 
 
@@ -33,3 +35,6 @@ class Colour(Enum):
 
     def __repr__(self) -> str:
         return self.__colour_codes__[self.value]
+
+    def __lt__(self, other: Colour) -> bool:
+        return self.value < other.value
