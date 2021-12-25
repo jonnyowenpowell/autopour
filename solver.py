@@ -8,7 +8,7 @@ PartialSolution = tuple[State, MoveList]
 
 
 def find_solution(tubes: list[Tube]) -> PartialSolution | None:
-    tube_ordinals = range(len(tubes))
+    state_length = len(tubes)
     partial_solutions: list[PartialSolution] = [(tubes, [])]
 
     observed_states: list[State] = []
@@ -18,14 +18,14 @@ def find_solution(tubes: list[Tube]) -> PartialSolution | None:
         print(f"{len(partial_solutions)=}")
 
         next_partial_solutions: list[PartialSolution] = []
-        for solution_to_advance in partial_solutions:
-            state = solution_to_advance[0]
-            moves = solution_to_advance[1]
+        for solution in partial_solutions:
+            state = solution[0]
+            moves = solution[1]
 
             if all([t.is_solid_colour() or t.is_empty() for t in state]):
-                return solution_to_advance
+                return solution
 
-            for i in tube_ordinals:
+            for i in range(state_length):
                 source_tube = state[i]
 
                 if source_tube.is_solid_colour():
@@ -35,21 +35,11 @@ def find_solution(tubes: list[Tube]) -> PartialSolution | None:
                 if pour == None:
                     continue
 
-                poured_to_empty = False
-                for j in tube_ordinals:
+                for j in range(state_length):
                     if j == i:
                         continue
 
                     target_tube = state[j]
-                    if target_tube.is_empty():
-                        if poured_to_empty:
-                            continue
-                        resulting_solution = make_move(
-                            state, moves, source_tube, target_tube, i, j
-                        )
-                        next_partial_solutions += [resulting_solution]
-                        poured_to_empty = True
-                        continue
 
                     if target_tube.can_receive(pour):
                         resulting_solution = make_move(
